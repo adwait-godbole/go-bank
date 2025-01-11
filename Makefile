@@ -8,13 +8,13 @@ dropdb:
 	docker exec -it postgres12 dropdb go_bank
 
 migratecreate:
-	migrate create -ext sql -dir db/migration -seq init_schema
+	migrate create -ext sql -dir db/migration -seq $(NAME)
 
 migrateup:
-	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/go_bank?sslmode=disable" -verbose up
+	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/go_bank?sslmode=disable" -verbose up $(N)
 
 migratedown:
-	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/go_bank?sslmode=disable" -verbose down
+	migrate -path db/migration -database "postgresql://root:secret@localhost:5432/go_bank?sslmode=disable" -verbose down $(N)
 
 sqlc:
 	sqlc generate
