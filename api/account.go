@@ -6,6 +6,7 @@ import (
 
 	db "github.com/adwait-godbole/go-bank/db/sqlc"
 	"github.com/gin-gonic/gin"
+	"github.com/lib/pq"
 )
 
 type createAccountRequest struct {
@@ -27,6 +28,15 @@ func (s *Server) createAccount(ctx *gin.Context) {
 	}
 	account, err := s.store.CreateAccount(ctx, arg)
 	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok {
+			switch pqErr.Code.Name() {
+			// foreign_key_violation occurs when we use an owner name (username) that never pointed to any entry in the users table
+			// unique_violation occurs when we already have let's say a "johndoe" USD account and trying to create the same again
+			case "foreign_key_violation", "unique_violation":
+				ctx.JSON(http.StatusForbidden, errorResponse(err))
+				return
+			}
+		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
