@@ -4,6 +4,7 @@
 set -e
 
 echo "run db migration"
+source /app/app.env # Read the values as environment variables as Viper has not yet come into picture at this point
 /app/migrate -path /app/migration -database "$DB_SOURCE" -verbose up
 
 echo "start the app"
