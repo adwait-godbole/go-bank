@@ -1,6 +1,6 @@
 name: Deploy to production
 
-# on:
+on:
   # push:
   #   branches: [ main ]
 
