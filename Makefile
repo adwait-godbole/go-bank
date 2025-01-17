@@ -40,4 +40,10 @@ server:
 mock:
 	mockgen -package mockdb -destination db/mock/store.go github.com/adwait-godbole/go-bank/db/sqlc Store
 
-.PHONY: network postgres createdb dropdb migratecreate migrateup migratedown db_docs db_schema sqlc test server mock
+proto:
+	rm -f pb/*.go
+	protoc --proto_path=proto --go_out=pb --go_opt=paths=source_relative \
+	--go-grpc_out=pb --go-grpc_opt=paths=source_relative \
+	proto/*.proto
+
+.PHONY: network postgres createdb dropdb migratecreate migrateup migratedown db_docs db_schema sqlc test server mock proto
