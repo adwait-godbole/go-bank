@@ -3,11 +3,16 @@ package main
 import (
 	"database/sql"
 	"log"
+	"net"
 
 	"github.com/adwait-godbole/go-bank/api"
 	db "github.com/adwait-godbole/go-bank/db/sqlc"
+	"github.com/adwait-godbole/go-bank/gapi"
+	"github.com/adwait-godbole/go-bank/pb"
 	"github.com/adwait-godbole/go-bank/util"
 	_ "github.com/lib/pq"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 func main() {
@@ -22,13 +27,39 @@ func main() {
 	}
 
 	store := db.NewSQLStore(conn)
-	server, err := api.NewServer(config, store)
+	runGrpcServer(config, store)
+}
+
+func runGrpcServer(config util.Config, store db.Store) {
+	server, err := gapi.NewServer(config, store)
 	if err != nil {
-		log.Fatal("cannot create server:", err)
+		log.Fatal("failed to create gRPC server: ", err)
 	}
 
-	err = server.Start(config.ServerAddress)
+	grpcServer := grpc.NewServer()
+	pb.RegisterGoBankServer(grpcServer, server)
+	reflection.Register(grpcServer) // helps the gRPC client to easily explore what RPCs are avilable on the server, and how to call them.
+
+	listener, err := net.Listen("tcp", config.GRPCServerAddress)
 	if err != nil {
-		log.Fatal("cannot start server:", err)
+		log.Fatal("failed to create listener: ", err)
+	}
+
+	log.Printf("starting gRPC server at %s", listener.Addr().String())
+	err = grpcServer.Serve(listener)
+	if err != nil {
+		log.Fatal("failed to start gRPC server: ", err)
+	}
+}
+
+func runGinServer(config util.Config, store db.Store) {
+	server, err := api.NewServer(config, store)
+	if err != nil {
+		log.Fatal("failed to create gin server:", err)
+	}
+
+	err = server.Start(config.HTTPServerAddress)
+	if err != nil {
+		log.Fatal("failed to start gin server:", err)
 	}
 }
