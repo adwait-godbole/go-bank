@@ -27,6 +27,24 @@ type Querier interface {
 	ListEntries(ctx context.Context, arg ListEntriesParams) ([]Entry, error)
 	ListTransfers(ctx context.Context, arg ListTransfersParams) ([]Transfer, error)
 	UpdateAccountBalance(ctx context.Context, arg UpdateAccountBalanceParams) (Account, error)
+	// UPDATE users
+	// SET
+	//   hashed_password = CASE
+	//     WHEN @set_hashed_password::boolean = TRUE THEN @hashed_password
+	//     ELSE hashed_password
+	//   END,
+	//   full_name = CASE
+	//     WHEN @set_full_name::boolean = TRUE THEN @full_name
+	//     ELSE full_name
+	//   END,
+	//   email = CASE
+	//     WHEN @set_email::boolean = TRUE THEN @email
+	//     ELSE email
+	//   END
+	// WHERE
+	//   username = @username
+	// RETURNING *;
+	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
 }
 
 var _ Querier = (*Queries)(nil)
