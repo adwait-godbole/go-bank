@@ -35,6 +35,7 @@ func main() {
 	store := db.NewSQLStore(conn)
 	go runGatewayServer(config, store)
 	runGrpcServer(config, store)
+	// runGinServer(config, store)
 }
 
 func runGatewayServer(config util.Config, store db.Store) {
@@ -43,6 +44,8 @@ func runGatewayServer(config util.Config, store db.Store) {
 		log.Fatal("failed to create gRPC server: ", err)
 	}
 
+	// We do the below jsonOption(s) so that we get the SAME field names as we have defined
+	// in the proto files back in the server responses
 	jsonOption := runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
 		MarshalOptions: protojson.MarshalOptions{
 			UseProtoNames: true,
