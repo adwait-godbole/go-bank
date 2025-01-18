@@ -9,11 +9,13 @@ import (
 
 	"github.com/adwait-godbole/go-bank/api"
 	db "github.com/adwait-godbole/go-bank/db/sqlc"
+	_ "github.com/adwait-godbole/go-bank/doc/statik"
 	"github.com/adwait-godbole/go-bank/gapi"
 	"github.com/adwait-godbole/go-bank/pb"
 	"github.com/adwait-godbole/go-bank/util"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	_ "github.com/lib/pq"
+	"github.com/rakyll/statik/fs"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -61,8 +63,16 @@ func runGatewayServer(config util.Config, store db.Store) {
 	mux := http.NewServeMux()
 	mux.Handle("/", grpcMux)
 
-	fs := http.FileServer(http.Dir("./doc/swagger"))
-	mux.Handle("/swagger/", http.StripPrefix("/swagger/", fs))
+	// The below approach of serving swagger docs will also force us to copy all static assets
+	// in the Dockerfile. Hence to avoid this we are preferring to use "statik".
+	// fs := http.FileServer(http.Dir("./doc/swagger"))
+
+	statikFs, err := fs.New()
+	if err != nil {
+		log.Fatal("failed to create statik fs: ", err)
+	}
+	swaggerHandler := http.StripPrefix("/swagger/", http.FileServer(statikFs))
+	mux.Handle("/swagger/", swaggerHandler)
 
 	listener, err := net.Listen("tcp", config.HTTPServerAddress)
 	if err != nil {
