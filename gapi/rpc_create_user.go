@@ -2,11 +2,14 @@ package gapi
 
 import (
 	"context"
+	"time"
 
 	db "github.com/adwait-godbole/go-bank/db/sqlc"
 	"github.com/adwait-godbole/go-bank/pb"
 	"github.com/adwait-godbole/go-bank/util"
 	"github.com/adwait-godbole/go-bank/val"
+	"github.com/adwait-godbole/go-bank/worker"
+	"github.com/hibiken/asynq"
 	"github.com/lib/pq"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
@@ -40,6 +43,24 @@ func (s *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb
 			}
 		}
 		return nil, status.Errorf(codes.Internal, "failed to create user: %s", err)
+	}
+
+	// TODO: use db transaction
+	taskPayload := &worker.PayloadSendVerificationEmail{
+		Username: user.Username,
+	}
+	opts := []asynq.Option{
+		asynq.MaxRetry(10),
+		asynq.ProcessIn(10 * time.Second),
+		asynq.Queue(worker.CriticalQueue),
+	}
+	err = s.taskDistributor.DistributeTaskSendVerificationEmail(ctx, taskPayload, opts...)
+	if err != nil {
+		return nil, status.Errorf(
+			codes.Internal,
+			"failed to distribute task to Redis queues to send verification email: %s",
+			err,
+		)
 	}
 
 	res := &pb.CreateUserResponse{
