@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	GoBank_CreateUser_FullMethodName = "/pb.GoBank/CreateUser"
-	GoBank_UpdateUser_FullMethodName = "/pb.GoBank/UpdateUser"
-	GoBank_LoginUser_FullMethodName  = "/pb.GoBank/LoginUser"
+	GoBank_CreateUser_FullMethodName  = "/pb.GoBank/CreateUser"
+	GoBank_VerifyEmail_FullMethodName = "/pb.GoBank/VerifyEmail"
+	GoBank_UpdateUser_FullMethodName  = "/pb.GoBank/UpdateUser"
+	GoBank_LoginUser_FullMethodName   = "/pb.GoBank/LoginUser"
 )
 
 // GoBankClient is the client API for GoBank service.
@@ -29,6 +30,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GoBankClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
+	VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*VerifyEmailResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
 	LoginUser(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*LoginUserResponse, error)
 }
@@ -45,6 +47,16 @@ func (c *goBankClient) CreateUser(ctx context.Context, in *CreateUserRequest, op
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CreateUserResponse)
 	err := c.cc.Invoke(ctx, GoBank_CreateUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *goBankClient) VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*VerifyEmailResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(VerifyEmailResponse)
+	err := c.cc.Invoke(ctx, GoBank_VerifyEmail_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -76,6 +88,7 @@ func (c *goBankClient) LoginUser(ctx context.Context, in *LoginUserRequest, opts
 // for forward compatibility.
 type GoBankServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
+	VerifyEmail(context.Context, *VerifyEmailRequest) (*VerifyEmailResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
 	LoginUser(context.Context, *LoginUserRequest) (*LoginUserResponse, error)
 	mustEmbedUnimplementedGoBankServer()
@@ -90,6 +103,9 @@ type UnimplementedGoBankServer struct{}
 
 func (UnimplementedGoBankServer) CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
+}
+func (UnimplementedGoBankServer) VerifyEmail(context.Context, *VerifyEmailRequest) (*VerifyEmailResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyEmail not implemented")
 }
 func (UnimplementedGoBankServer) UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
@@ -132,6 +148,24 @@ func _GoBank_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GoBankServer).CreateUser(ctx, req.(*CreateUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GoBank_VerifyEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyEmailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GoBankServer).VerifyEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GoBank_VerifyEmail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GoBankServer).VerifyEmail(ctx, req.(*VerifyEmailRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -182,6 +216,10 @@ var GoBank_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateUser",
 			Handler:    _GoBank_CreateUser_Handler,
+		},
+		{
+			MethodName: "VerifyEmail",
+			Handler:    _GoBank_VerifyEmail_Handler,
 		},
 		{
 			MethodName: "UpdateUser",

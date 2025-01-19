@@ -7,9 +7,9 @@ import (
 )
 
 type TaskDistributor interface {
-	DistributeTaskSendVerificationEmail(
+	DistributeTaskSendVerifyEmail(
 		ctx context.Context,
-		payload *PayloadSendVerificationEmail,
+		payload *PayloadSendVerifyEmail,
 		opts ...asynq.Option,
 	) error
 }

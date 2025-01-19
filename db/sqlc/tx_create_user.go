@@ -11,8 +11,6 @@ type CreateUserTxResult struct {
 	User User
 }
 
-// CreateUserTx performs a money transfer from one account to the other.
-// It creates a transfer record, add account entries and update accounts' balance within a single database transaction.
 func (store *SQLStore) CreateUserTx(ctx context.Context, arg CreateUserTxParams) (CreateUserTxResult, error) {
 	var result CreateUserTxResult
 

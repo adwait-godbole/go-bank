@@ -56,7 +56,7 @@ type User struct {
 	IsEmailVerified   bool      `json:"is_email_verified"`
 }
 
-type VerificationEmail struct {
+type VerifyEmail struct {
 	ID         int64     `json:"id"`
 	Username   string    `json:"username"`
 	Email      string    `json:"email"`

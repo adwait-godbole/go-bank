@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml.dbdiagram.io)
 -- Database: PostgreSQL
--- Generated at: 2025-01-19T16:53:23.264Z
+-- Generated at: 2025-01-19T18:57:41.714Z
 
 CREATE TABLE "users" (
   "username" varchar PRIMARY KEY,
@@ -12,7 +12,7 @@ CREATE TABLE "users" (
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
-CREATE TABLE "verification_emails" (
+CREATE TABLE "verify_emails" (
   "id" bigserial PRIMARY KEY,
   "username" varchar NOT NULL,
   "email" varchar NOT NULL,
@@ -72,7 +72,7 @@ COMMENT ON COLUMN "entries"."amount" IS 'can be -ve or +ve';
 
 COMMENT ON COLUMN "transfers"."amount" IS 'must be +ve';
 
-ALTER TABLE "verification_emails" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
+ALTER TABLE "verify_emails" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
 
 ALTER TABLE "sessions" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
 
