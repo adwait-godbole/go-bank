@@ -12,7 +12,7 @@ createdb:
 dropdb:
 	docker exec -it postgres12 dropdb go_bank
 
-migratecreate:
+new_migration:
 	migrate create -ext sql -dir db/migration -seq $(NAME)
 
 migrateup:
@@ -59,4 +59,4 @@ redis:
 test-redis:
 	docker exec -it redis redis-cli ping
 
-.PHONY: network postgres createdb dropdb migratecreate migrateup migratedown db_docs db_schema sqlc test server mock proto evans
+.PHONY: network postgres createdb dropdb new_migration migrateup migratedown db_docs db_schema sqlc test server mock proto evans

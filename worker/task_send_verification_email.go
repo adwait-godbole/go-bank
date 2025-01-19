@@ -6,6 +6,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	db "github.com/adwait-godbole/go-bank/db/sqlc"
+	"github.com/adwait-godbole/go-bank/util"
 	"github.com/hibiken/asynq"
 	"github.com/rs/zerolog/log"
 )
@@ -58,7 +60,32 @@ func (processor *RedisTaskProcessor) ProcessTaskSendVerificationEmail(
 		return fmt.Errorf("failed to get user: %w", err)
 	}
 
-	// TODO: send email to user
+	verificationEmail, err := processor.store.CreateVerificationEmail(ctx, db.CreateVerificationEmailParams{
+		Username:   user.Username,
+		Email:      user.Email,
+		SecretCode: util.RandomString(32),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to create verification email: %w", err)
+	}
+
+	subject := "Welcome to Go Bank"
+	verificationURL := fmt.Sprintf(
+		"http://go-bank.org/verify_email?id=%d&secret_code=%s",
+		verificationEmail.ID,
+		verificationEmail.SecretCode,
+	)
+	content := fmt.Sprintf(`Hello %s,<br/>
+	Thank you for registering with us!<br/>
+	Please <a href="%s">click here</a> to verify your email address.<br/>
+	`, user.FullName, verificationURL)
+	to := []string{user.Email}
+
+	err = processor.mailer.SendEmail(subject, content, to, nil, nil, nil)
+	if err != nil {
+		return fmt.Errorf("failed to send verification email: %w", err)
+	}
+
 	log.Info().
 		Str("type", task.Type()).
 		Bytes("payload", task.Payload()).
