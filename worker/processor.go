@@ -39,6 +39,7 @@ func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store) TaskPr
 						Bytes("payload", task.Payload()).
 						Msg("process task failed")
 				}),
+				// This formats the asynq logs in the zerolog format
 				Logger: NewLogger(),
 			},
 		),

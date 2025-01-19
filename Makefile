@@ -32,7 +32,7 @@ sqlc:
 
 test:
 	go clean -testcache
-	go test -v -cover ./...
+	go test -v -cover -short ./...
 
 server:
 	go run main.go
