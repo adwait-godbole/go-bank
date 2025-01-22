@@ -2,7 +2,6 @@ package gapi
 
 import (
 	"context"
-	"database/sql"
 	"testing"
 	"time"
 
@@ -11,6 +10,7 @@ import (
 	"github.com/adwait-godbole/go-bank/pb"
 	"github.com/adwait-godbole/go-bank/token"
 	"github.com/adwait-godbole/go-bank/util"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 	"google.golang.org/grpc/codes"
@@ -108,7 +108,7 @@ func TestUpdateUserAPI(t *testing.T) {
 				store.EXPECT().
 					UpdateUser(gomock.Any(), gomock.Any()).
 					Times(1).
-					Return(db.User{}, sql.ErrNoRows)
+					Return(db.User{}, db.ErrRecordNotFound)
 			},
 			buildContext: func(tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute)
@@ -130,11 +130,11 @@ func TestUpdateUserAPI(t *testing.T) {
 			buildStubs: func(store *mockdb.MockStore) {
 				arg := db.UpdateUserParams{
 					Username: user.Username,
-					FullName: sql.NullString{
+					FullName: pgtype.Text{
 						String: newFullName,
 						Valid:  true,
 					},
-					Email: sql.NullString{
+					Email: pgtype.Text{
 						String: newEmail,
 						Valid:  true,
 					},

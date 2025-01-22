@@ -175,7 +175,7 @@ func TestGetAccountAPI(t *testing.T) {
 				mockStore.EXPECT().
 					GetAccount(gomock.Any(), gomock.Eq(account.ID)). // I expect the GetAccount function of the store to be called with any context and this specific account ID argument
 					Times(1).
-					Return(db.Account{}, sql.ErrNoRows)
+					Return(db.Account{}, db.ErrRecordNotFound)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, recorder.Code, http.StatusNotFound)

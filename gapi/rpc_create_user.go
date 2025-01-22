@@ -10,7 +10,6 @@ import (
 	"github.com/adwait-godbole/go-bank/val"
 	"github.com/adwait-godbole/go-bank/worker"
 	"github.com/hibiken/asynq"
-	"github.com/lib/pq"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -50,12 +49,9 @@ func (s *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb
 
 	txResult, err := s.store.CreateUserTx(ctx, arg)
 	if err != nil {
-		if pqErr, ok := err.(*pq.Error); ok {
-			switch pqErr.Code.Name() {
+		if db.ErrorCode(err) == db.UniqueViolation {
 			// unique_violation occurs when we already have another user with the same username or same email
-			case "unique_violation":
-				return nil, status.Errorf(codes.AlreadyExists, err.Error())
-			}
+			return nil, status.Errorf(codes.AlreadyExists, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal, "failed to create user: %s", err)
 	}

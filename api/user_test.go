@@ -15,7 +15,6 @@ import (
 	db "github.com/adwait-godbole/go-bank/db/sqlc"
 	"github.com/adwait-godbole/go-bank/util"
 	"github.com/gin-gonic/gin"
-	"github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
@@ -120,7 +119,7 @@ func TestCreateUserAPI(t *testing.T) {
 				store.EXPECT().
 					CreateUser(gomock.Any(), gomock.Any()).
 					Times(1).
-					Return(db.User{}, &pq.Error{Code: "23505"})
+					Return(db.User{}, db.ErrUniqueViolation)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, recorder.Code, http.StatusForbidden)
@@ -233,7 +232,7 @@ func TestLoginUserAPI(t *testing.T) {
 				store.EXPECT().
 					GetUser(gomock.Any(), gomock.Eq("NotFound")).
 					Times(1).
-					Return(db.User{}, sql.ErrNoRows)
+					Return(db.User{}, db.ErrRecordNotFound)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, recorder.Code, http.StatusNotFound)
