@@ -15,7 +15,6 @@ A backend web service for a bank providing APIs to do the following things:
 - [Docker desktop](https://www.docker.com/products/docker-desktop)
 - [TablePlus](https://tableplus.com/)
 - [Golang](https://golang.org/)
-- [Homebrew](https://brew.sh/)
 - [Migrate](https://github.com/golang-migrate/migrate/tree/master/cmd/migrate)
 
   ```bash
