@@ -2,7 +2,7 @@
 
 Tech Stack: Go, Gin, gRPC, Protocol Buffers, PostgreSQL, Asynq, Redis, Docker, JWT, GoMock.
 
-A backend web service for a simple bank providing APIs to do the following things:
+A backend web service for a bank providing APIs to do the following things:
 
 1. Create and manage bank accounts, which are composed of owner’s name, balance, and currency.
 2. Record all balance changes to each of the account. So every time some money is added to or subtracted from the account, an account entry record will be created.
