@@ -99,7 +99,7 @@ A backend web service for a bank providing APIs to do the following things:
   make db_docs
   ```
 
-- Access the DB documentation at [this address](https://dbdocs.io/techschool.guru/simple_bank). Password: `secret`
+- Access the DB documentation at [this address](https://dbdocs.io/adwait-godbole/go_bank). Password: `secret`
 
 ### How to generate code
 
