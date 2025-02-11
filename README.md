@@ -1,6 +1,6 @@
 # GoBank
 
-Tech Stack: Go, Gin, gRPC, Protocol Buffers, PostgreSQL, Asynq, Redis, Docker, JWT, GoMock.
+Tech Stack: Go, Gin, gRPC, Protocol Buffers, PostgreSQL, sqlc, Asynq, Redis, Docker, JWT, GoMock.
 
 A backend web service for a bank providing APIs to do the following things:
 
